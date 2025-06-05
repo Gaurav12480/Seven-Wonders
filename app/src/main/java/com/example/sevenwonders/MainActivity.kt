@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,11 +20,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -31,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -60,43 +59,33 @@ class MainActivity : ComponentActivity() {
 fun SevenWonderApp() {
     var num by remember { mutableIntStateOf(1) }
 
-    var (image, name, info) = when (num) {
-        1 -> Triple (R.drawable.chichen_itza,
-            R.string.chichen_itza,
-            R.string.ci)
-        2 -> Triple (R.drawable.christ_the_redeemer,
-            R.string.christ_the_redeemer,
-            R.string.ctr)
-        3 -> Triple (R.drawable.colosseum,
-            R.string.colosseum,
-            R.string.c)
-        4 -> Triple (R.drawable.great_wall_of_china,
-            R.string.great_wall_of_china,
-            R.string.gwoc)
-        5 -> Triple (R.drawable.machu_pichu,
-            R.string.machu_pichu,
-            R.string.mp)
-        6 -> Triple (R.drawable.petra,
-            R.string.petra,
-            R.string.p)
-        else -> Triple(R.drawable.taj_mahal,
-            R.string.taj_mahal,
-            R.string.tm)
-    }
-
     Column (
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
+            .verticalScroll(rememberScrollState())
+            .background(color = MaterialTheme.colorScheme.background)
         ,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Wonder(
-            image = image,
-            name = name,
-            info = info
-        )
+        AnimatedContent(
+        targetState = num,
+        label = "WonderTransition"
+    ) { targetNum ->
+        val (image, name, info) = when (targetNum) {
+            1 -> Triple(R.drawable.chichen_itza, R.string.chichen_itza, R.string.ci)
+            2 -> Triple(R.drawable.christ_the_redeemer, R.string.christ_the_redeemer, R.string.ctr)
+            3 -> Triple(R.drawable.colosseum, R.string.colosseum, R.string.c)
+            4 -> Triple(R.drawable.great_wall_of_china, R.string.great_wall_of_china, R.string.gwoc)
+            5 -> Triple(R.drawable.machu_pichu, R.string.machu_pichu, R.string.mp)
+            6 -> Triple(R.drawable.petra, R.string.petra, R.string.p)
+            else -> Triple(R.drawable.taj_mahal, R.string.taj_mahal, R.string.tm)
+        }
+
+        Wonder(image = image, name = name, info = info)
+    }
+
         Row (
             modifier = Modifier
                 .fillMaxWidth()
@@ -111,10 +100,13 @@ fun SevenWonderApp() {
                     else num--
                 },
                 modifier = Modifier.size(width = 120.dp, height = 40.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xff000f89))
-            ) {
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                ) {
                 Text(
-                    text = stringResource(R.string.previousButton)
+                    text = stringResource(R.string.previousButton),
                 )
             }
 
@@ -124,15 +116,17 @@ fun SevenWonderApp() {
                     else num++
                 },
                 modifier = Modifier.size(width = 120.dp, height = 40.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xff000f89))
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             ) {
                 Text(
-                    text = stringResource(R.string.nextButton)
+                    text = stringResource(R.string.nextButton),
                 )
             }
         }
     }
-
 }
 
 @Composable
@@ -151,19 +145,16 @@ fun Wonder(
         Surface (
             shadowElevation = 4.dp,
             modifier = Modifier
-                .size(height = 480.dp, width = 340.dp)
-
-            ,
+                .size(height = 480.dp, width = 340.dp),
+            color = MaterialTheme.colorScheme.surface
         ) {
             Image(
                 modifier = Modifier
-                    .border(width = 8.dp, color = Color(0xffEEEEEE), shape = RectangleShape)
+                    .border(width = 8.dp, color = MaterialTheme.colorScheme.outline, shape = RectangleShape)
                     .padding(30.dp)
                 ,
                 painter = painterResource(image),
-                contentDescription = null,
-
-
+                contentDescription = null
             )
         }
 
@@ -171,12 +162,12 @@ fun Wonder(
 
         Column(
             modifier = Modifier
-                .background(color = Color(0xffEEEEEE))
+                .background(color = MaterialTheme.colorScheme.secondaryContainer)
                 .size(height = 120.dp, width = 340.dp)
                 .verticalScroll(rememberScrollState())
                 .padding(8.dp)
             ,
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
             Text(
@@ -187,6 +178,7 @@ fun Wonder(
                 fontSize = 36.sp,
                 fontWeight = FontWeight(180),
                 lineHeight = 36.sp,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             )
             Text(
                 modifier = Modifier
@@ -195,6 +187,7 @@ fun Wonder(
                 text = stringResource(info),
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             )
         }
     }
